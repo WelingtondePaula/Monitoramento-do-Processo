@@ -1,26 +1,30 @@
-// app.js - script inicial para Monitoramento do Processo
+// app.js - estrutura corrigida do dashboard (remove cards aninhados)
 document.addEventListener('DOMContentLoaded', () => {
   const container = document.querySelector('main') || document.body;
   const dashboard = document.createElement('div');
   dashboard.className = 'container';
   dashboard.innerHTML = `
-    <div class="card grid">
-      <div class="card metric">
-        <div>
-          <div class="small">Processos ativos</div>
-          <div class="value" id="active-count">—</div>
+    <div class="card">
+      <div class="grid">
+        <div class="card metric">
+          <div>
+            <div class="small">Processos ativos</div>
+            <div class="value" id="active-count">—</div>
+          </div>
+          <div><button class="btn" id="refresh">Atualizar</button></div>
         </div>
-        <div><button class="btn" id="refresh">Atualizar</button></div>
-      </div>
-      <div class="card metric">
-        <div>
-          <div class="small">Erros (últ. hora)</div>
-          <div class="value" id="error-count">—</div>
+
+        <div class="card metric">
+          <div>
+            <div class="small">Erros (últ. hora)</div>
+            <div class="value" id="error-count">—</div>
+          </div>
         </div>
-      </div>
-      <div class="card text-center">
-        <div class="small">Última atualização</div>
-        <div id="last-updated" class="small">—</div>
+
+        <div class="card text-center">
+          <div class="small">Última atualização</div>
+          <div id="last-updated" class="small">—</div>
+        </div>
       </div>
     </div>
   `;
