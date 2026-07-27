@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+  <!-- Impede que o navegador guarde cache do arquivo -->
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+  <meta http-equiv="Pragma" content="no-cache">
+  <meta http-equiv="Expires" content="0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sistema de Gestão e Monitoramento do Processo Industrial</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .main-container {
+            width: 100%;
+            max-width: 1050px;
+        }
+
+        .header-principal {
+            background-color: #ffffff;
+            border-radius: 8px 8px 0 0;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #007bff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            gap: 10px;
+        }
+        .header-principal img {
+            max-height: 45px;
+            width: auto;
+        }
+        .header-principal h1 {
+            margin: 0;
+            font-size: 20px;
+            color: #1a1a1a;
+        }
+
+        .user-bar {
+            background: #e9ecef;
+            padding: 8px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 14px;
+            border-bottom: 1px solid #ccc;
+        }
+
+        .print-header-logo {
+            display: none;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background-color: #fff;
+            overflow: hidden;
+            border-bottom: 2px solid #dee2e6;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .tab-btn {
+            flex: 1;
+            padding: 12px 10px;
+            border: none;
+            background-color: #f8f9fa;
+            font-size: 15px;
+            font-weight: bold;
+            color: #495057;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+            display: none; /* Controlado via JS */
+        }
+        .tab-btn.active {
+            background-color: #fff;
+            color: #007bff;
+            border-bottom: 3px solid #007bff;
+        }
+
+        .tab-content {
+            display: none;
+            background: white;
+            padding: 20px;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .tab-content.active { display: block; }
+
+        .container-box {
+            background: #ffffff;
+            border: 1px solid #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        h2, h3, h4 { margin-top: 0; color: #1a1a1a; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 6px; font-weight: bold; color: #444; font-size: 15px; }
+
+        input[type="text"], input[type="number"], input[type="password"], input[type="datetime-local"], input[type="month"], select {
+            width: 100%;
+            padding: 12px 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+            outline: none;
+        }
+        input:focus, select:focus { border-color: #007bff; }
+
+        .row { 
+            display: flex; 
+            gap: 15px; 
+            flex-direction: row; 
+        }
+        .col { flex: 1; }
+
+        .checkbox-group {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            background: #f8f9fa;
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #dee2e6;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: normal;
+            cursor: pointer;
+        }
+        .checkbox-item input {
+            width: auto;
+            cursor: pointer;
+        }
+
+        .parametros-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        button.btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            transition: opacity 0.2s;
+        }
+        .btn-verde { background-color: #28a745; color: white; }
+        .btn-azul { background-color: #007bff; color: white; }
+        .btn-vermelho { background-color: #dc3545; color: white; }
+        .btn-cinza { background-color: #6c757d; color: white; }
+        button.btn:hover { opacity: 0.9; }
+        button:disabled { background-color: #6c757d !important; cursor: not-allowed; opacity: 0.6; }
+
+        .parametro-box {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            padding: 15px;
+            border-radius: 6px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .parametro-title {
+            font-size: 17px;
+            font-weight: bold;
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+
+        .info-badges {
+            display: flex;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+        .badge-info {
+            flex: 1;
+            background: #e9ecef;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            padding: 6px 2px;
+            text-align: center;
+        }
+        .badge-info span {
+            display: block;
+            font-size: 10px;
+            color: #6c757d;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+        .badge-info strong {
+            display: block;
+            font-size: 13px;
+            color: #333;
+        }
+
+        .range-sucesso { border-color: #28a745 !important; background-color: #d4edda !important; }
+        .range-erro { border-color: #dc3545 !important; background-color: #f8d7da !important; }
+        .msg-erro { color: #dc3545; font-size: 13px; margin-top: 5px; display: none; }
+
+        .param-row-cad {
+            background: #fdfdfd;
+            border: 1px solid #dee2e6;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 12px;
+            position: relative;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 5px;
+        }
+        table, th, td { border: 1px solid #dee2e6; }
+        th, td { padding: 8px; text-align: center; font-size: 14px; }
+        th { background-color: #f8f9fa; white-space: nowrap; }
+        .txt-left { text-align: left !important; }
+        
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            max-width: 100%;
+            border: 1px solid #dee2e6;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+
+        .header-grupo {
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 6px 6px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 5px;
+        }
+
+        .header-data-col {
+            background-color: #e9ecef;
+            color: #333;
+            font-size: 11px;
+            padding: 6px;
+        }
+
+        /* Modal Login */
+        .modal-login {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        .modal-login-card {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        @media screen and (max-width: 768px) {
+            body { padding: 5px; }
+            .header-principal { flex-direction: column; text-align: center; }
+            .header-principal h1 { font-size: 18px; }
+            .nav-tabs { flex-direction: column; }
+            .tab-btn { font-size: 14px; padding: 10px; border-bottom: 1px solid #dee2e6; }
+            .row { flex-direction: column; gap: 0; }
+            .tab-content { padding: 15px 10px; }
+        }
+
+        /* REGRAS EXCLUSIVAS DE IMPRESSÃO */
+        @media print {
+            @page {
+                size: A4 landscape;
+                margin: 5mm;
+            }
+            body { 
+                background-color: #fff !important; 
+                padding: 0 !important; 
+                margin: 0 !important; 
+                font-size: 13px !important;
+            }
+            .main-container { max-width: 100% !important; width: 100% !important; }
+            
+            .header-principal, .user-bar, .nav-tabs, .container-box, .no-print, button, h2, p { 
+                display: none !important; 
+            }
+
+            .print-header-logo {
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                padding-bottom: 8px !important;
+                margin-bottom: 8px !important;
+                border-bottom: 2px solid #000 !important;
+            }
+            .print-header-logo h2 {
+                display: block !important;
+                margin: 0 !important;
+                font-size: 18px !important;
+                color: #000 !important;
+            }
+            .print-header-logo img {
+                max-height: 40px !important;
+                width: auto !important;
+            }
+            
+            .tab-content { 
+                box-shadow: none !important; 
+                padding: 0 !important; 
+                border: none !important; 
+                display: block !important; 
+            }
+
+            .header-grupo { 
+                background-color: #f0f0f0 !important; 
+                color: #000 !important; 
+                border: 1px solid #000 !important; 
+                padding: 6px 10px !important; 
+                font-size: 15px !important; 
+                font-weight: bold !important;
+                display: flex !important;
+                justify-content: space-between !important;
+            }
+
+            .table-responsive { 
+                overflow: visible !important; 
+                border: none !important; 
+                margin-bottom: 10px !important; 
+                page-break-inside: avoid; 
+            }
+
+            table { 
+                width: 100% !important; 
+                border-collapse: collapse !important; 
+                table-layout: fixed !important; 
+            }
+
+            table, th, td { border: 1px solid #333 !important; }
+
+            th, td { 
+                padding: 4px 2px !important; 
+                font-size: 13px !important; 
+                line-height: 1.15 !important; 
+                word-break: break-word; 
+            }
+
+            th { background-color: #f8f8f8 !important; }
+
+            th.header-data-col { 
+                font-size: 11px !important; 
+            }
+
+            .header-tecnico-nome {
+                font-weight: bold !important;
+                color: #000 !important;
+                font-size: 9px !important;
+            }
+
+            .txt-left { font-size: 11px !important; width: 200px !important; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- MODAL DE LOGIN -->
+<div id="modalLogin" class="modal-login">
+    <div class="modal-login-card">
+        <h2 style="text-align: center; margin-bottom: 20px;">🔐 Acesso ao Sistema</h2>
+        <div class="form-group">
+            <label for="loginMatricula">Matrícula:</label>
+            <input type="text" id="loginMatricula" placeholder="Digite sua matrícula...">
+        </div>
+        <div class="form-group">
+            <label for="loginSenha">Senha:</label>
+            <input type="password" id="loginSenha" placeholder="Digite sua senha...">
+        </div>
+        <button class="btn btn-azul" onclick="realizarLogin()">Entrar</button>
+    </div>
+</div>
+
+<div class="main-container">
+    <div class="header-principal">
+        <h1>Sistema de Monitoramento de Processos</h1>
+        <img src="Logo Yamada.png" alt="Logo YMB Yamada Brasil">
+    </div>
+
+    <div id="userBar" class="user-bar" style="display: none;">
+        <span>👤 Usuário: <strong id="lblUsuarioNome">-</strong> (<span id="lblUsuarioNivel">-</span>)</span>
+        <button class="btn btn-cinza" style="width: auto; padding: 4px 10px; font-size: 12px;" onclick="realizarLogout()">Sair / Trocar Usuário</button>
+    </div>
+
+    <div class="nav-tabs">
+        <button id="btnTabMonitoramento" class="tab-btn" tabindex="-1" onclick="trocarAba('monitoramento')">📋 Monitoramento do Processo</button>
+        <button id="btnTabHistorico" class="tab-btn" tabindex="-1" onclick="trocarAba('historico')">📈 Acompanhamento</button>
+        <button id="btnTabEngenharia" class="tab-btn" tabindex="-1" onclick="trocarAba('engenharia')">⚙️ Cadastros (Engenharia)</button>
+        <button id="btnTabAcesso" class="tab-btn" tabindex="-1" onclick="trocarAba('acesso')">🔐 Gestão de Acessos</button>
+    </div>
+
+    <!-- ABA 1: MONITORAMENTO DO PROCESSO -->
+    <div id="abaMonitoramento" class="tab-content">
+        <h2>📋 Monitoramento do Processo</h2>
+        <hr style="border:0; border-top: 1px solid #eee; margin-bottom: 15px;">
+
+        <div class="row">
+            <div class="col form-group">
+                <label for="nomeTecnico">Nome do Técnico Responsável:</label>
+                <input type="text" id="nomeTecnico" tabindex="-1" placeholder="Digite seu nome..." readonly>
+            </div>
+            <div class="col form-group">
+                <label for="dataRealizacao">Data e Hora da Realização:</label>
+                <input type="datetime-local" id="dataRealizacao" tabindex="-1">
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col form-group">
+                <label for="selectMaquinaMonitoramento">🤖 Máquina / Equipamento:</label>
+                <select id="selectMaquinaMonitoramento" tabindex="-1" onchange="carregarProdutosMonitoramento()">
+                    <option value="">-- Selecione uma Máquina --</option>
+                </select>
+            </div>
+            <div class="col form-group">
+                <label for="selectProdutoMonitoramento">📦 Produto Cadastrado:</label>
+                <select id="selectProdutoMonitoramento" tabindex="-1" disabled onchange="carregarParametrosMonitoramento()">
+                    <option value="">-- Selecione a Máquina Primeiro --</option>
+                </select>
+            </div>
+        </div>
+
+        <div id="containerParametrosMonitoramento" class="parametros-grid"></div>
+
+        <button id="btnSalvarRegistro" class="btn btn-azul" tabindex="-1" disabled>Salvar Registro de Monitoramento</button>
+    </div>
+
+    <!-- ABA 2: ACOMPANHAMENTO -->
+    <div id="abaHistorico" class="tab-content">
+        <div class="print-header-logo">
+            <h2>Relatório de Acompanhamento do Processo</h2>
+            <img src="Logo Yamada.png" alt="Logo YMB Yamada Brasil">
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 10px;">
+            <h2 style="margin: 0;">📈 Acompanhamento</h2>
+            <button class="btn btn-verde no-print" style="width: auto; padding: 8px 16px; font-size: 13px;" onclick="imprimirAcompanhamento()">🖨️ Imprimir Folha de Acompanhamento</button>
+        </div>
+        
+        <p class="no-print" style="color: #666; font-size: 13px; margin-bottom: 15px;">Histórico de medições por Máquina/Produto.</p>
+
+        <div class="container-box no-print">
+            <div class="row">
+                <div class="col form-group">
+                    <label for="filtroMaquina">Filtrar por Máquina:</label>
+                    <select id="filtroMaquina" onchange="renderizarHistorico()">
+                        <option value="">Todas as Máquinas</option>
+                    </select>
+                </div>
+                <div class="col form-group">
+                    <label for="filtroProduto">Filtrar por Produto:</label>
+                    <select id="filtroProduto" onchange="renderizarHistorico()">
+                        <option value="">Todos os Produtos</option>
+                    </select>
+                </div>
+                <div class="col form-group">
+                    <label for="filtroMesAno">Filtrar por Mês/Ano:</label>
+                    <input type="month" id="filtroMesAno" onchange="renderizarHistorico()">
+                </div>
+                <div class="col form-group">
+                    <label for="filtroLimite">Qtd. de Colunas:</label>
+                    <select id="filtroLimite" onchange="renderizarHistorico()">
+                        <option value="15" selected>Últimos 15 registros (1 Folha)</option>
+                        <option value="10">Últimos 10 registros</option>
+                        <option value="0">Todos os registros</option>
+                    </select>
+                </div>
+            </div>
+            <button class="btn btn-cinza" style="padding: 6px 12px; font-size: 12px; width: auto;" onclick="limparHistorico()">🗑️ Limpar Todo Histórico</button> 
+        </div>
+
+        <div id="listaHistorico">Nenhum registro encontrado.</div>
+    </div>
+
+    <!-- ABA 3: ENGENHARIA -->
+    <div id="abaEngenharia" class="tab-content">
+        <div id="loginEngenhariaBox">
+            <h3>🔒 Acesso Restrito à Engenharia</h3>
+            <p style="color: #666; font-size: 13px;">Insira a senha de engenheiro para cadastrar/editar parâmetros.</p>
+            <div class="form-group">
+                <label for="senhaEngenharia">Senha de Acesso:</label>
+                <input type="password" id="senhaEngenharia" placeholder="Digite a senha...">
+            </div>
+            <button class="btn btn-azul" onclick="autenticarEngenharia()">Acessar Painel</button>
+        </div>
+
+        <div id="painelEngenhariaBox" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                <h2 style="margin: 0;">Painel de Engenharia</h2>
+                <button class="btn btn-cinza" style="width: auto; padding: 6px 12px; font-size: 12px;" onclick="bloquearEngenharia()">Sair</button>
+            </div>
+
+            <div class="row">
+                <div class="col container-box">
+                    <h3>🤖 Cadastrar Máquina</h3>
+                    <div class="form-group">
+                        <label for="nomeMaquinaEng">Nome/Modelo do Equipamento:</label>
+                        <input type="text" id="nomeMaquinaEng" placeholder="Ex: Injetora 01">
+                    </div>
+                    <button class="btn btn-verde" id="btnSalvarMaquina">Adicionar Máquina</button>
+                </div>
+
+                <div class="col container-box">
+                    <h3>📦 Cadastrar Produto</h3>
+                    <div class="form-group">
+                        <label for="nomeProdutoEng">Nome/Código SKU do Produto:</label>
+                        <input type="text" id="nomeProdutoEng" placeholder="Ex: Peça Plástica A">
+                    </div>
+                    <button class="btn btn-verde" id="btnSalvarProduto">Adicionar Produto</button>
+                </div>
+            </div>
+
+            <div class="container-box">
+                <h3>📊 Cadastrar Parâmetros para Conjunto (Máquina + Produto)</h3>
+                <div class="row">
+                    <div class="col form-group">
+                        <label for="selectMaquinaParam">Selecionar Máquina:</label>
+                        <select id="selectMaquinaParam">
+                            <option value="">-- Selecione uma Máquina --</option>
+                        </select>
+                    </div>
+                    <div class="col form-group">
+                        <label for="selectProdutoParam">Selecionar Produto:</label>
+                        <select id="selectProdutoParam">
+                            <option value="">-- Selecione um Produto --</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div id="listaCadastrosParametros"></div>
+
+                <div class="row" style="margin-bottom: 15px; gap: 10px;">
+                    <div class="col">
+                        <button class="btn btn-cinza" type="button" onclick="adicionarLinhaParametro()">➕ Adicionar Outro Parâmetro</button>
+                    </div>
+                    <div class="col">
+                        <button class="btn btn-azul" id="btnSalvarParametro">Vincular Parâmetros Cadastrados</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="container-box">
+                <h3>📋 Parâmetros Configurados</h3>
+                <div id="tabelaDadosEngenharia" class="table-responsive">Nenhum dado cadastrado.</div>
+            </div>
+
+            <details>
+                <summary style="cursor: pointer; color: #666; font-size: 13px;">Configurações: Alterar Senha de Engenharia</summary>
+                <div class="form-group" style="margin-top: 10px;">
+                    <input type="password" id="novaSenhaInput" placeholder="Nova Senha...">
+                    <button class="btn btn-cinza" onclick="alterarSenha()" style="margin-top: 8px;">Atualizar Senha</button>
+                </div>
+            </details>
+        </div>
+    </div>
+
+    <!-- ABA 4: GESTÃO DE ACESSOS -->
+    <div id="abaAcesso" class="tab-content">
+        <h2>🔐 Gestão de Controle de Acesso</h2>
+        <hr style="border:0; border-top: 1px solid #eee; margin-bottom: 15px;">
+
+        <div class="container-box">
+            <h3>👤 Cadastrar / Editar Usuário</h3>
+            <div class="row">
+                <div class="col form-group">
+                    <label for="cadMatricula">Matrícula:</label>
+                    <input type="text" id="cadMatricula" placeholder="Ex: 1001">
+                </div>
+                <div class="col form-group">
+                    <label for="cadNome">Nome Completo:</label>
+                    <input type="text" id="cadNome" placeholder="Ex: João Silva">
+                </div>
+            </div>
+            <div class="row">
+                <div class="col form-group">
+                    <label for="cadSenha">Senha Individual:</label>
+                    <input type="password" id="cadSenha" placeholder="Digite a senha...">
+                </div>
+                <div class="col form-group">
+                    <label for="cadSetor">Setor:</label>
+                    <input type="text" id="cadSetor" placeholder="Ex: Produção / Qualidade">
+                </div>
+                <div class="col form-group">
+                    <label for="cadNivel">Cargo / Descrição:</label>
+                    <select id="cadNivel">
+                        <option value="técnico">Técnico</option>
+                        <option value="supervisão">Supervisão</option>
+                        <option value="engenharia">Engenharia</option>
+                        <option value="administrador">Administrador</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>📌 Abas Permitidas para Acesso:</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-item"><input type="checkbox" id="permMonitoramento" checked> 📋 Monitoramento</label>
+                    <label class="checkbox-item"><input type="checkbox" id="permHistorico"> 📈 Acompanhamento</label>
+                    <label class="checkbox-item"><input type="checkbox" id="permEngenharia"> ⚙️ Engenharia</label>
+                    <label class="checkbox-item"><input type="checkbox" id="permAcesso"> 🔐 Gestão de Acessos</label>
+                </div>
+            </div>
+
+            <button class="btn btn-verde" onclick="salvarUsuario()">Salvar Usuário</button>
+        </div>
+
+        <div class="container-box">
+            <h3>📋 Usuários Cadastrados</h3>
+            <div id="tabelaUsuarios" class="table-responsive">Nenhum usuário cadastrado.</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    var USUARIOS_PADRAO = [
+        { 
+            matricula: "admin", 
+            nome: "Administrador Sistema", 
+            senha: "admin", 
+            setor: "TI / Gestão", 
+            nivel: "administrador",
+            permissoes: ["monitoramento", "historico", "engenharia", "acesso"]
+        },
+        { 
+            matricula: "tec1", 
+            nome: "Técnico Operacional", 
+            senha: "123", 
+            setor: "Produção", 
+            nivel: "técnico",
+            permissoes: ["monitoramento"]
+        },
+        { 
+            matricula: "sup1", 
+            nome: "Supervisor Qualidade", 
+            senha: "123", 
+            setor: "Qualidade", 
+            nivel: "supervisão",
+            permissoes: ["historico"]
+        },
+        { 
+            matricula: "eng1", 
+            nome: "Engenheiro Processo", 
+            senha: "123", 
+            setor: "Engenharia", 
+            nivel: "engenharia",
+            permissoes: ["monitoramento", "engenharia"]
+        }
+    ];
+
+    var ESTRUTURA_INICIAL = {
+        maquinas: [
+            { id: "maq_1", nome: "Injetora de Plástico 01" }
+        ],
+        produtos: [
+            { id: "prod_1", nome: "Peça Plástica A" }
+        ],
+        parametros: [
+            { id: "p1", maquinaId: "maq_1", produtoId: "prod_1", nome: "Temperatura Zona 1 (°C)", target: 200, min: 180, max: 220, orientativo: false },
+            { id: "p2", maquinaId: "maq_1", produtoId: "prod_1", nome: "Pressão de Injeção (bar)", target: 135, min: 120, max: 150, orientativo: false }
+        ]
+    };
+
+    var usuarioLogado = null;
+
+    function getUsuarios() {
+        var u = localStorage.getItem('usuariosSistemaIndustrial');
+        return u ? JSON.parse(u) : USUARIOS_PADRAO;
+    }
+
+    function setUsuarios(lista) {
+        localStorage.setItem('usuariosSistemaIndustrial', JSON.stringify(lista));
+    }
+
+    function getBancoDados() {
+        var dados = localStorage.getItem('bancoSistemaIndustrial');
+        return dados ? JSON.parse(dados) : ESTRUTURA_INICIAL;
+    }
+
+    function setBancoDados(dados) {
+        localStorage.setItem('bancoSistemaIndustrial', JSON.stringify(dados));
+    }
+
+    function getHistorico() {
+        var hist = localStorage.getItem('historicoMonitoramento');
+        return hist ? JSON.parse(hist) : [];
+    }
+
+    function setHistorico(lista) {
+        localStorage.setItem('historicoMonitoramento', JSON.stringify(lista));
+    }
+
+    function getSenhaMaster() {
+        return localStorage.getItem('senhaEngenhariaMaster') || '1234';
+    }
+
+    function setAgoraInputData() {
+        try {
+            var now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            var isoStr = now.toISOString();
+            document.getElementById('dataRealizacao').value = isoStr.slice(0, 16);
+        } catch(e) {
+            console.log("Erro ao definir data:", e);
+        }
+    }
+
+    /* CONTROLE DE LOGIN E NÍVEIS DE ACESSO */
+    function realizarLogin() {
+        var mat = document.getElementById('loginMatricula').value.trim();
+        var sen = document.getElementById('loginSenha').value;
+
+        var lista = getUsuarios();
+        var user = lista.find(function(u) { return u.matricula === mat && u.senha === sen; });
+
+        if (user) {
+            usuarioLogado = user;
+            document.getElementById('modalLogin').style.display = "none";
+            document.getElementById('userBar').style.display = "flex";
+            document.getElementById('lblUsuarioNome').innerText = user.nome;
+            document.getElementById('lblUsuarioNivel').innerText = (user.nivel || 'Usuário').toUpperCase();
+            document.getElementById('nomeTecnico').value = user.nome;
+
+            aplicarPermissoes(user);
+        } else {
+            alert("Matrícula ou Senha incorretas!");
+        }
+    }
+
+    function realizarLogout() {
+        usuarioLogado = null;
+        document.getElementById('loginMatricula').value = "";
+        document.getElementById('loginSenha').value = "";
+        document.getElementById('modalLogin').style.display = "flex";
+        document.getElementById('userBar').style.display = "none";
+    }
+
+    function aplicarPermissoes(user) {
+        var btnMon = document.getElementById('btnTabMonitoramento');
+        var btnHis = document.getElementById('btnTabHistorico');
+        var btnEng = document.getElementById('btnTabEngenharia');
+        var btnAce = document.getElementById('btnTabAcesso');
+
+        btnMon.style.display = "none";
+        btnHis.style.display = "none";
+        btnEng.style.display = "none";
+        btnAce.style.display = "none";
+
+        var perms = user.permissoes || [];
+
+        // Suporte retrocompatível se o usuário antigo não tiver array de permissoes
+        if (perms.length === 0 && user.nivel) {
+            if (user.nivel === "técnico") perms = ["monitoramento"];
+            if (user.nivel === "supervisão") perms = ["historico"];
+            if (user.nivel === "engenharia") perms = ["monitoramento", "engenharia"];
+            if (user.nivel === "administrador") perms = ["monitoramento", "historico", "engenharia", "acesso"];
+        }
+
+        var primeiraAbaDisponivel = "";
+
+        if (perms.indexOf("monitoramento") !== -1) {
+            btnMon.style.display = "block";
+            if (!primeiraAbaDisponivel) primeiraAbaDisponivel = "monitoramento";
+        }
+        if (perms.indexOf("historico") !== -1) {
+            btnHis.style.display = "block";
+            if (!primeiraAbaDisponivel) primeiraAbaDisponivel = "historico";
+        }
+        if (perms.indexOf("engenharia") !== -1) {
+            btnEng.style.display = "block";
+            if (!primeiraAbaDisponivel) primeiraAbaDisponivel = "engenharia";
+        }
+        if (perms.indexOf("acesso") !== -1) {
+            btnAce.style.display = "block";
+            if (!primeiraAbaDisponivel) primeiraAbaDisponivel = "acesso";
+        }
+
+        if (primeiraAbaDisponivel) {
+            trocarAba(primeiraAbaDisponivel);
+        } else {
+            alert("Sua conta não tem acesso a nenhuma aba. Solicite ao administrador.");
+        }
+    }
+
+    function trocarAba(aba) {
+        var btns = document.querySelectorAll('.tab-btn');
+        var contents = document.querySelectorAll('.tab-content');
+        
+        for(var i = 0; i < btns.length; i++) btns[i].classList.remove('active');
+        for(var j = 0; j < contents.length; j++) contents[j].classList.remove('active');
+
+        if (aba === 'monitoramento') {
+            document.getElementById('btnTabMonitoramento').classList.add('active');
+            document.getElementById('abaMonitoramento').classList.add('active');
+            carregarMaquinasMonitoramento();
+            setAgoraInputData();
+        } else if (aba === 'historico') {
+            document.getElementById('btnTabHistorico').classList.add('active');
+            document.getElementById('abaHistorico').classList.add('active');
+            carregarFiltrosHistorico();
+            renderizarHistorico();
+        } else if (aba === 'engenharia') {
+            document.getElementById('btnTabEngenharia').classList.add('active');
+            document.getElementById('abaEngenharia').classList.add('active');
+        } else if (aba === 'acesso') {
+            document.getElementById('btnTabAcesso').classList.add('active');
+            document.getElementById('abaAcesso').classList.add('active');
+            renderizarUsuarios();
+        }
+    }
+
+    /* ABA DE ACESSOS */
+    function salvarUsuario() {
+        var mat = document.getElementById('cadMatricula').value.trim();
+        var nome = document.getElementById('cadNome').value.trim();
+        var sen = document.getElementById('cadSenha').value;
+        var setor = document.getElementById('cadSetor').value.trim();
+        var nivel = document.getElementById('cadNivel').value;
+
+        var permissoes = [];
+        if (document.getElementById('permMonitoramento').checked) permissoes.push("monitoramento");
+        if (document.getElementById('permHistorico').checked) permissoes.push("historico");
+        if (document.getElementById('permEngenharia').checked) permissoes.push("engenharia");
+        if (document.getElementById('permAcesso').checked) permissoes.push("acesso");
+
+        if (!mat || !nome || !sen) {
+            return alert("Por favor, preencha Matrícula, Nome e Senha!");
+        }
+
+        if (permissoes.length === 0) {
+            return alert("Selecione pelo menos uma aba de acesso para este usuário!");
+        }
+
+        var lista = getUsuarios();
+        var idx = lista.findIndex(function(u) { return u.matricula === mat; });
+
+        var usuarioObj = {
+            matricula: mat,
+            nome: nome,
+            senha: sen,
+            setor: setor,
+            nivel: nivel,
+            permissoes: permissoes
+        };
+
+        if (idx >= 0) {
+            lista[idx] = usuarioObj;
+            alert("Usuário atualizado com sucesso!");
+        } else {
+            lista.push(usuarioObj);
+            alert("Usuário cadastrado com sucesso!");
+        }
+
+        setUsuarios(lista);
+        document.getElementById('cadMatricula').value = "";
+        document.getElementById('cadNome').value = "";
+        document.getElementById('cadSenha').value = "";
+        document.getElementById('cadSetor').value = "";
+        renderizarUsuarios();
+    }
+
+    function excluirUsuario(matricula) {
+        if (matricula === 'admin') {
+            return alert("O usuário 'admin' padrão não pode ser removido!");
+        }
+        if (!confirm("Deseja realmente excluir este usuário?")) return;
+
+        var lista = getUsuarios();
+        lista = lista.filter(function(u) { return u.matricula !== matricula; });
+        setUsuarios(lista);
+        renderizarUsuarios();
+    }
+
+    function renderizarUsuarios() {
+        var lista = getUsuarios();
+        var html = '<table><thead><tr>' +
+            '<th>Matrícula</th><th>Nome</th><th>Setor</th><th>Cargo</th><th>Acessos Liberados</th><th>Ações</th>' +
+            '</tr></thead><tbody>';
+
+        if (lista.length === 0) {
+            html += '<tr><td colspan="6" style="text-align:center; color:#888;">Nenhum usuário cadastrado.</td></tr>';
+        } else {
+            lista.forEach(function(u) {
+                var perms = u.permissoes || [];
+                var nomesPerms = [];
+                if (perms.indexOf("monitoramento") !== -1) nomesPerms.push("Monitoramento");
+                if (perms.indexOf("historico") !== -1) nomesPerms.push("Acompanhamento");
+                if (perms.indexOf("engenharia") !== -1) nomesPerms.push("Engenharia");
+                if (perms.indexOf("acesso") !== -1) nomesPerms.push("Acessos");
+
+                html += '<tr>' +
+                    '<td><strong>' + u.matricula + '</strong></td>' +
+                    '<td class="txt-left">' + u.nome + '</td>' +
+                    '<td>' + (u.setor || '-') + '</td>' +
+                    '<td><span style="text-transform: capitalize; font-weight: bold;">' + (u.nivel || '-') + '</span></td>' +
+                    '<td><small>' + (nomesPerms.join(", ") || 'Nenhum') + '</small></td>' +
+                    '<td><button class="btn btn-vermelho" style="padding:2px 6px; font-size:10px; width:auto;" onclick="excluirUsuario(\'' + u.matricula + '\')">Excluir</button></td>' +
+                '</tr>';
+            });
+        }
+
+        html += '</tbody></table>';
+        document.getElementById('tabelaUsuarios').innerHTML = html;
+    }
+
+    function autenticarEngenharia() {
+        var senhaDigitada = document.getElementById('senhaEngenharia').value;
+        if (senhaDigitada === getSenhaMaster()) {
+            document.getElementById('senhaEngenharia').value = "";
+            document.getElementById('loginEngenhariaBox').style.display = "none";
+            document.getElementById('painelEngenhariaBox').style.display = "block";
+            atualizarInterfaceEngenharia();
+        } else {
+            alert("Senha incorreta!");
+        }
+    }
+
+    function bloquearEngenharia() {
+        document.getElementById('loginEngenhariaBox').style.display = "block";
+        document.getElementById('painelEngenhariaBox').style.display = "none";
+    }
+
+    function alterarSenha() {
+        var nova = document.getElementById('novaSenhaInput').value.trim();
+        if (nova.length >= 4) {
+            localStorage.setItem('senhaEngenhariaMaster', nova);
+            alert("Senha atualizada com sucesso!");
+            document.getElementById('novaSenhaInput').value = "";
+        } else {
+            alert("A senha precisa ter pelo menos 4 caracteres.");
+        }
+    }
+
+    function adicionarLinhaParametro() {
+        var container = document.getElementById('listaCadastrosParametros');
+        var count = container.children.length;
+        
+        var html = '<div class="param-row-cad">';
+        if (count > 0) {
+            html += '<button type="button" class="btn btn-vermelho" style="position: absolute; right: 10px; top: 10px; padding: 2px 8px; width: auto; font-size: 11px;" onclick="this.parentElement.remove()">✕ Remover</button>';
+        }
+        html += '<div class="form-group">' +
+                '<label>Nome do Parâmetro:</label>' +
+                '<input type="text" class="input-param-nome" placeholder="Ex: Temperatura (°C)">' +
+                '</div>' +
+                '<div class="form-group" style="margin-bottom: 10px;">' +
+                '<label style="font-weight: normal; cursor: pointer; color: #007bff;"><input type="checkbox" class="input-param-orientativo" style="width: auto; margin-right: 6px;"> ℹ️ Campo apenas orientativo/informativo (sem limites/validação obrigatória)</label>' +
+                '</div>' +
+                '<div class="row">' +
+                '<div class="col form-group">' +
+                '<label>Target (Informativo):</label>' +
+                '<input type="number" step="any" class="input-param-target" placeholder="Ex: 200">' +
+                '</div>' +
+                '<div class="col form-group">' +
+                '<label>Mínimo (LSL):</label>' +
+                '<input type="number" step="any" class="input-param-min" placeholder="Ex: 180">' +
+                '</div>' +
+                '<div class="col form-group">' +
+                '<label>Máximo (USL):</label>' +
+                '<input type="number" step="any" class="input-param-max" placeholder="Ex: 220">' +
+                '</div>' +
+                '</div>' +
+                '</div>';
+        
+        container.insertAdjacentHTML('beforeend', html);
+    }
+
+    function excluirItem(tipo, id) {
+        if (!confirm("Deseja realmente remover este registro?")) return;
+        var banco = getBancoDados();
+
+        if (tipo === 'maquina') {
+            banco.maquinas = banco.maquinas.filter(function(m) { return m.id !== id; });
+            banco.parametros = banco.parametros.filter(function(p) { return p.maquinaId !== id; });
+        } else if (tipo === 'produto') {
+            banco.produtos = banco.produtos.filter(function(p) { return p.id !== id; });
+            banco.parametros = banco.parametros.filter(function(p) { return p.produtoId !== id; });
+        } else if (tipo === 'parametro') {
+            banco.parametros = banco.parametros.filter(function(p) { return p.id !== id; });
+        }
+
+        setBancoDados(banco);
+        atualizarInterfaceEngenharia();
+    }
+
+    function atualizarInterfaceEngenharia() {
+        var banco = getBancoDados();
+        var selectMaq = document.getElementById('selectMaquinaParam');
+        var selectProd = document.getElementById('selectProdutoParam');
+
+        selectMaq.innerHTML = '<option value="">-- Selecione uma Máquina --</option>';
+        selectProd.innerHTML = '<option value="">-- Selecione um Produto --</option>';
+
+        banco.maquinas.forEach(function(m) { selectMaq.innerHTML += '<option value="' + m.id + '">' + m.nome + '</option>'; });
+        banco.produtos.forEach(function(p) { selectProd.innerHTML += '<option value="' + p.id + '">' + p.nome + '</option>'; });
+
+        if (document.getElementById('listaCadastrosParametros').children.length === 0) {
+            adicionarLinhaParametro();
+        }
+
+        var htmlTabela = '<table><thead><tr>' +
+            '<th>🤖 Máquina</th><th>📦 Produto</th><th>📊 Parâmetro</th><th>Tipo</th><th>Target</th><th>Mín</th><th>Máx</th><th>Ações</th>' +
+            '</tr></thead><tbody>';
+
+        if (banco.parametros.length === 0) {
+            htmlTabela += '<tr><td colspan="8" style="text-align:center; color:#888;">Nenhum parâmetro vinculado.</td></tr>';
+        } else {
+            banco.parametros.forEach(function(p) {
+                var maqObj = banco.maquinas.find(function(m) { return m.id === p.maquinaId; });
+                var prodObj = banco.produtos.find(function(pr) { return pr.id === p.produtoId; });
+
+                var maq = maqObj ? maqObj.nome : 'Removida';
+                var prod = prodObj ? prodObj.nome : 'Removido';
+                var tipoTxt = p.orientativo ? '<span style="color:#6c757d; font-size:11px;">Orientativo</span>' : '<span style="color:#28a745; font-size:11px;">Monitorado</span>';
+
+                htmlTabela += '<tr>' +
+                    '<td class="txt-left"><strong>' + maq + '</strong></td>' +
+                    '<td class="txt-left"><strong>' + prod + '</strong></td>' +
+                    '<td class="txt-left">' + p.nome + '</td>' +
+                    '<td>' + tipoTxt + '</td>' +
+                    '<td>' + (p.target !== undefined ? p.target : '-') + '</td>' +
+                    '<td style="color: #007bff; font-weight: bold;">' + p.min + '</td>' +
+                    '<td style="color: #dc3545; font-weight: bold;">' + p.max + '</td>' +
+                    '<td><button class="btn btn-vermelho" style="padding:2px 6px; font-size:10px; width:auto;" onclick="excluirItem(\'parametro\', \'' + p.id + '\')">Excluir</button></td>' +
+                '</tr>';
+            });
+        }
+
+        htmlTabela += '</tbody></table>';
+        document.getElementById('tabelaDadosEngenharia').innerHTML = htmlTabela;
+    }
+
+    function carregarMaquinasMonitoramento() {
+        var banco = getBancoDados();
+        var selectMaquinaMonitoramento = document.getElementById('selectMaquinaMonitoramento');
+        var selectProdutoMonitoramento = document.getElementById('selectProdutoMonitoramento');
+        
+        selectMaquinaMonitoramento.innerHTML = '<option value="">-- Selecione uma Máquina --</option>';
+        selectProdutoMonitoramento.innerHTML = '<option value="">-- Selecione a Máquina Primeiro --</option>';
+        selectProdutoMonitoramento.disabled = true;
+        document.getElementById('containerParametrosMonitoramento').innerHTML = "";
+        document.getElementById('btnSalvarRegistro').disabled = true;
+
+        banco.maquinas.forEach(function(m) {
+            selectMaquinaMonitoramento.innerHTML += '<option value="' + m.id + '">' + m.nome + '</option>';
+        });
+    }
+
+    function carregarProdutosMonitoramento() {
+        var maqId = document.getElementById('selectMaquinaMonitoramento').value;
+        var selectProdutoMonitoramento = document.getElementById('selectProdutoMonitoramento');
+        var banco = getBancoDados();
+
+        selectProdutoMonitoramento.innerHTML = '<option value="">-- Selecione um Produto --</option>';
+        document.getElementById('containerParametrosMonitoramento').innerHTML = "";
+        document.getElementById('btnSalvarRegistro').disabled = true;
+
+        if (!maqId) {
+            selectProdutoMonitoramento.disabled = true;
+            return;
+        }
+
+        var idsProdutosVinculados = [];
+        banco.parametros.forEach(function(p) {
+            if (p.maquinaId === maqId && idsProdutosVinculados.indexOf(p.produtoId) === -1) {
+                idsProdutosVinculados.push(p.produtoId);
+            }
+        });
+
+        if (idsProdutosVinculados.length === 0) {
+            selectProdutoMonitoramento.innerHTML = '<option value="">Sem produtos vinculados</option>';
+            selectProdutoMonitoramento.disabled = true;
+            return;
+        }
+
+        idsProdutosVinculados.forEach(function(prodId) {
+            var prod = banco.produtos.find(function(p) { return p.id === prodId; });
+            if (prod) {
+                selectProdutoMonitoramento.innerHTML += '<option value="' + prod.id + '">' + prod.nome + '</option>';
+            }
+        });
+
+        selectProdutoMonitoramento.disabled = false;
+    }
+
+    function carregarParametrosMonitoramento() {
+        var maqId = document.getElementById('selectMaquinaMonitoramento').value;
+        var prodId = document.getElementById('selectProdutoMonitoramento').value;
+        var container = document.getElementById('containerParametrosMonitoramento');
+        var banco = getBancoDados();
+
+        container.innerHTML = "";
+        document.getElementById('btnSalvarRegistro').disabled = true;
+
+        if (!maqId || !prodId) return;
+
+        var params = banco.parametros.filter(function(p) { return p.maquinaId === maqId && p.produtoId === prodId; });
+
+        if (params.length === 0) {
+            container.innerHTML = "<p style='color: #888; grid-column: 1/-1;'>Sem parâmetros cadastrados.</p>";
+            return;
+        }
+
+        params.forEach(function(param) {
+            var isOrientativo = param.orientativo === true;
+            var html = '<div class="parametro-box" data-id="' + param.id + '" data-nome="' + param.nome + '" data-target="' + (param.target !== undefined ? param.target : '-') + '" data-min="' + param.min + '" data-max="' + param.max + '" data-orientativo="' + (isOrientativo ? 'true' : 'false') + '">' +
+                '<div>' +
+                    '<div class="parametro-title">' + param.nome + (isOrientativo ? ' <small style="color:#6c757d; font-size:12px; font-weight:normal;">(Orientativo)</small>' : '') + '</div>' +
+                    '<div class="info-badges">' +
+                        '<div class="badge-info"><span>Target</span><strong>' + (param.target !== undefined ? param.target : '-') + '</strong></div>' +
+                        '<div class="badge-info"><span>Mínimo</span><strong style="color: #007bff;">' + param.min + '</strong></div>' +
+                        '<div class="badge-info"><span>Máximo</span><strong style="color: #dc3545;">' + param.max + '</strong></div>' +
+                    '</div>' +
+                '</div>' +
+                '<div>' +
+                    '<label style="font-size: 14px;">Valor Medido:</label>' +
+                    '<input type="number" step="any" class="input-valida" placeholder="' + (isOrientativo ? 'Opcional / Orientativo...' : 'Digite o valor...') + '">' +
+                    '<div class="msg-erro">Valor fora da faixa (' + param.min + ' a ' + param.max + ')</div>' +
+                '</div>' +
+            '</div>';
+            container.insertAdjacentHTML('beforeend', html);
+        });
+
+        adicionarEventosValidacaoTecnico();
+        var primeiroCampo = container.querySelector('.input-valida');
+        if (primeiroCampo) primeiroCampo.focus();
+    }
+
+    function adicionarEventosValidacaoTecnico() {
+        var inputs = document.querySelectorAll('#containerParametrosMonitoramento .input-valida');
+        inputs.forEach(function(input) {
+            input.addEventListener('input', function() {
+                var box = input.closest('.parametro-box');
+                var isOrientativo = box.dataset.orientativo === 'true';
+
+                if (isOrientativo) {
+                    validarFormularioTecnico();
+                    return;
+                }
+
+                var min = parseFloat(box.dataset.min);
+                var max = parseFloat(box.dataset.max);
+                var valor = parseFloat(input.value);
+                var msgErro = box.querySelector('.msg-erro');
+
+                if (isNaN(valor)) {
+                    input.className = "input-valida";
+                    msgErro.style.display = "none";
+                } else if (valor >= min && valor <= max) {
+                    input.className = "input-valida range-sucesso";
+                    msgErro.style.display = "none";
+                } else {
+                    input.className = "input-valida range-erro";
+                    msgErro.style.display = "block";
+                }
+
+                validarFormularioTecnico();
+            });
+        });
+    }
+
+    function validarFormularioTecnico() {
+        var boxes = document.querySelectorAll('#containerParametrosMonitoramento .parametro-box');
+        var nomeTecnico = document.getElementById('nomeTecnico');
+        var dataRealizacao = document.getElementById('dataRealizacao');
+        
+        var tecnicoOK = nomeTecnico.value.trim().length > 0;
+        var dataOK = dataRealizacao.value.length > 0;
+        var valido = tecnicoOK && dataOK && boxes.length > 0;
+
+        boxes.forEach(function(box) {
+            var isOrientativo = box.dataset.orientativo === 'true';
+            var input = box.querySelector('.input-valida');
+            var valor = parseFloat(input.value);
+
+            if (!isOrientativo) {
+                var min = parseFloat(box.dataset.min);
+                var max = parseFloat(box.dataset.max);
+
+                if (isNaN(valor) || valor < min || valor > max) {
+                    valido = false;
+                }
+            }
+        });
+
+        document.getElementById('btnSalvarRegistro').disabled = !valido;
+    }
+
+    function carregarFiltrosHistorico() {
+        var banco = getBancoDados();
+        var fMaq = document.getElementById('filtroMaquina');
+        var fProd = document.getElementById('filtroProduto');
+
+        fMaq.innerHTML = '<option value="">Todas as Máquinas</option>';
+        fProd.innerHTML = '<option value="">Todos os Produtos</option>';
+
+        banco.maquinas.forEach(function(m) { fMaq.innerHTML += '<option value="' + m.id + '">' + m.nome + '</option>'; });
+        banco.produtos.forEach(function(p) { fProd.innerHTML += '<option value="' + p.id + '">' + p.nome + '</option>'; });
+    }
+
+    function renderizarHistorico() {
+        var historico = getHistorico();
+        var filtroMaq = document.getElementById('filtroMaquina').value;
+        var filtroProd = document.getElementById('filtroProduto').value;
+        var filtroMesAno = document.getElementById('filtroMesAno').value;
+        var filtroLimiteVal = parseInt(document.getElementById('filtroLimite').value, 10);
+        var container = document.getElementById('listaHistorico');
+
+        var listaFiltrada = historico.filter(function(reg) {
+            var bateMaquina = !filtroMaq || reg.maquinaId === filtroMaq;
+            var bateProduto = !filtroProd || reg.produtoId === filtroProd;
+            var bateMesAno = !filtroMesAno || reg.mesAno === filtroMesAno;
+            return bateMaquina && bateProduto && bateMesAno;
+        });
+
+        if (listaFiltrada.length === 0) {
+            container.innerHTML = "<p style='color: #888; font-style: italic; text-align: center; padding: 20px;'>Nenhum registro encontrado para os filtros selecionados.</p>";
+            return;
+        }
+
+        var grupos = {};
+        listaFiltrada.forEach(function(reg) {
+            var chaveGrupo = reg.maquinaId + '_' + reg.produtoId;
+            if (!grupos[chaveGrupo]) {
+                grupos[chaveGrupo] = {
+                    maquinaNome: reg.maquinaNome,
+                    produtoNome: reg.produtoNome,
+                    registros: []
+                };
+            }
+            grupos[chaveGrupo].registros.push(reg);
+        });
+
+        var htmlFinal = "";
+
+        Object.keys(grupos).forEach(function(chave) {
+            var grupo = grupos[chave];
+            
+            grupo.registros.sort(function(a, b) {
+                return (b.timestamp || 0) - (a.timestamp || 0);
+            });
+
+            var registrosExibição = grupo.registros;
+            if (filtroLimiteVal > 0 && registrosExibição.length > filtroLimiteVal) {
+                registrosExibição = registrosExibição.slice(0, filtroLimiteVal);
+            }
+
+            registrosExibição.sort(function(a, b) {
+                return (a.timestamp || 0) - (b.timestamp || 0);
+            });
+
+            var parametrosUnicos = [];
+
+            registrosExibição.forEach(function(r) {
+                r.leituras.forEach(function(l) {
+                    var existe = parametrosUnicos.find(function(p) { return p.nome === l.paramNome; });
+                    if (!existe) {
+                        parametrosUnicos.push({
+                            nome: l.paramNome,
+                            min: l.min,
+                            target: l.target !== undefined ? l.target : '-',
+                            max: l.max
+                        });
+                    }
+                });
+            });
+
+            var colunasData = registrosExibição.map(function(r) {
+                return { id: r.id, dataHora: r.dataHora, tecnico: r.tecnico };
+            });
+
+            var htmlGrupo = '<div class="table-responsive">' +
+                '<div class="header-grupo"><span>🤖 MÁQUINA: ' + grupo.maquinaNome + '</span><span>📦 PRODUTO: ' + grupo.produtoNome + '</span></div>' +
+                '<table><thead><tr><th class="txt-left">Parâmetro</th><th style="width: 36px;">LSL</th><th style="width: 36px;">TGT</th><th style="width: 36px;">USL</th>';
+
+            colunasData.forEach(function(col) {
+                var partesData = col.dataHora.split(' ');
+                var dataAbrev = partesData[0] ? partesData[0].substr(0,5) : col.dataHora;
+                var horaAbrev = partesData[1] ? partesData[1].substr(0,5) : '';
+                
+                htmlGrupo += '<th class="header-data-col">' + dataAbrev + '<br>' + horaAbrev + '<br><div class="header-tecnico-nome" style="margin-top:2px;">👤 ' + col.tecnico + '</div></th>';
+            });
+
+            htmlGrupo += '</tr></thead><tbody>';
+
+            parametrosUnicos.forEach(function(param) {
+                htmlGrupo += '<tr>' +
+                    '<td class="txt-left"><strong>' + param.nome + '</strong></td>' +
+                    '<td style="color: #007bff; font-weight: bold;">' + param.min + '</td>' +
+                    '<td style="color: #6c757d; font-weight: bold;">' + param.target + '</td>' +
+                    '<td style="color: #dc3545; font-weight: bold;">' + param.max + '</td>';
+
+                colunasData.forEach(function(col) {
+                    var reg = registrosExibição.find(function(r) { return r.id === col.id; });
+                    var leitura = null;
+                    if (reg) {
+                        leitura = reg.leituras.find(function(l) { return l.paramNome === param.nome; });
+                    }
+
+                    if (leitura && leitura.valorMedido !== undefined && !isNaN(leitura.valorMedido)) {
+                        htmlGrupo += '<td style="font-weight: bold; background-color: #e8f5e9;">' + leitura.valorMedido + '</td>';
+                    } else {
+                        htmlGrupo += '<td style="color: #ccc;">-</td>';
+                    }
+                });
+
+                htmlGrupo += '</tr>';
+            });
+
+            htmlGrupo += '</tbody></table></div>';
+            htmlFinal += htmlGrupo;
+        });
+
+        container.innerHTML = htmlFinal;
+    }
+
+    function limparHistorico() {
+        if (confirm("Tem certeza que deseja apagar todo o histórico de monitoramento?")) {
+            localStorage.removeItem('historicoMonitoramento');
+            renderizarHistorico();
+        }
+    }
+
+    function imprimirAcompanhamento() {
+        window.print();
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById('dataRealizacao').addEventListener('change', validarFormularioTecnico);
+
+        document.getElementById('btnSalvarMaquina').addEventListener('click', function() {
+            var nome = document.getElementById('nomeMaquinaEng').value.trim();
+            if (!nome) return alert('Insira o nome da máquina!');
+            var banco = getBancoDados();
+            banco.maquinas.push({ id: 'maq_' + Date.now(), nome: nome });
+            setBancoDados(banco);
+            document.getElementById('nomeMaquinaEng').value = "";
+            atualizarInterfaceEngenharia();
+            alert('Máquina Cadastrada!');
+        });
+
+        document.getElementById('btnSalvarProduto').addEventListener('click', function() {
+            var nome = document.getElementById('nomeProdutoEng').value.trim();
+            if (!nome) return alert('Insira o nome do produto!');
+            var banco = getBancoDados();
+            banco.produtos.push({ id: 'prod_' + Date.now(), nome: nome });
+            setBancoDados(banco);
+            document.getElementById('nomeProdutoEng').value = "";
+            atualizarInterfaceEngenharia();
+            alert('Produto Cadastrado!');
+        });
+
+        document.getElementById('btnSalvarParametro').addEventListener('click', function() {
+            var maqId = document.getElementById('selectMaquinaParam').value;
+            var prodId = document.getElementById('selectProdutoParam').value;
+
+            if (!maqId || !prodId) {
+                return alert('Selecione a Máquina e o Produto!');
+            }
+
+            var linhas = document.querySelectorAll('.param-row-cad');
+            var novosParametros = [];
+            var erroValidacao = false;
+
+            linhas.forEach(function(linha) {
+                var nome = linha.querySelector('.input-param-nome').value.trim();
+                var targetVal = linha.querySelector('.input-param-target').value;
+                var minVal = linha.querySelector('.input-param-min').value;
+                var maxVal = linha.querySelector('.input-param-max').value;
+                var isOrientativo = linha.querySelector('.input-param-orientativo').checked;
+
+                var min = parseFloat(minVal);
+                var max = parseFloat(maxVal);
+                var target = targetVal !== "" ? parseFloat(targetVal) : "-";
+
+                if (!nome) {
+                    erroValidacao = true;
+                    return;
+                }
+
+                if (!isOrientativo) {
+                    if (isNaN(min) || isNaN(max)) {
+                        erroValidacao = true;
+                        return;
+                    }
+                    if (min >= max) {
+                        alert('No parâmetro "' + nome + '", o limite mínimo deve ser menor que o máximo!');
+                        erroValidacao = true;
+                        return;
+                    }
+                }
+
+                novosParametros.push({
+                    id: 'param_' + Date.now() + '_' + Math.random().toString(36).substr(2, 5),
+                    maquinaId: maqId,
+                    produtoId: prodId,
+                    nome: nome,
+                    target: target,
+                    min: isNaN(min) ? '-' : min,
+                    max: isNaN(max) ? '-' : max,
+                    orientativo: isOrientativo
+                });
+            });
+
+            if (erroValidacao) {
+                return alert('Preencha corretamente os nomes e os limites dos parâmetros monitorados.');
+            }
+
+            if (novosParametros.length === 0) {
+                return alert('Adicione pelo menos um parâmetro!');
+            }
+
+            var banco = getBancoDados();
+            banco.parametros = banco.parametros.concat(novosParametros);
+            setBancoDados(banco);
+
+            document.getElementById('listaCadastrosParametros').innerHTML = "";
+            adicionarLinhaParametro();
+            atualizarInterfaceEngenharia();
+            alert('Parâmetros Vinculados com Sucesso!');
+        });
+
+        document.getElementById('btnSalvarRegistro').addEventListener('click', function() {
+            var banco = getBancoDados();
+            var maqId = document.getElementById('selectMaquinaMonitoramento').value;
+            var prodId = document.getElementById('selectProdutoMonitoramento').value;
+
+            var maqObj = banco.maquinas.find(function(m) { return m.id === maqId; });
+            var prodObj = banco.produtos.find(function(p) { return p.id === prodId; });
+
+            var nomeMaq = maqObj ? maqObj.nome : '';
+            var nomeProd = prodObj ? prodObj.nome : '';
+            var nomeTec = document.getElementById('nomeTecnico').value.trim();
+            var dataObj = new Date(document.getElementById('dataRealizacao').value);
+            var dataFormatada = dataObj.toLocaleString('pt-BR');
+            var mesAnoIso = document.getElementById('dataRealizacao').value.slice(0, 7); 
+
+            var leituras = [];
+            document.querySelectorAll('#containerParametrosMonitoramento .parametro-box').forEach(function(box) {
+                var inputVal = box.querySelector('.input-valida').value;
+                leituras.push({
+                    paramNome: box.dataset.nome,
+                    target: box.dataset.target,
+                    min: box.dataset.min,
+                    max: box.dataset.max,
+                    valorMedido: inputVal !== "" ? parseFloat(inputVal) : "-"
+                });
+            });
+
+            var historico = getHistorico();
+            var novoRegistro = {
+                id: 'rec_' + Date.now(),
+                timestamp: dataObj.getTime(),
+                tecnico: nomeTec,
+                dataHora: dataFormatada,
+                mesAno: mesAnoIso,
+                maquinaId: maqId,
+                maquinaNome: nomeMaq,
+                produtoId: prodId,
+                produtoNome: nomeProd,
+                leituras: leituras,
+                status: "Aprovado"
+            };
+
+            historico.unshift(novoRegistro);
+            setHistorico(historico);
+
+            alert("✅ Registro Salvo!\n\n🤖 Máquina: " + nomeMaq + "\n📦 Produto: " + nomeProd + "\n📅 Data: " + dataFormatada);
+
+            document.getElementById('selectMaquinaMonitoramento').value = "";
+            document.getElementById('selectProdutoMonitoramento').innerHTML = '<option value="">-- Selecione a Máquina Primeiro --</option>';
+            document.getElementById('selectProdutoMonitoramento').disabled = true;
+            document.getElementById('containerParametrosMonitoramento').innerHTML = "";
+            document.getElementById('btnSalvarRegistro').disabled = true;
+        });
+
+        if (!localStorage.getItem('usuariosSistemaIndustrial')) {
+            setUsuarios(USUARIOS_PADRAO);
+        }
+    });
+</script>
+
+</body>
+</html>
